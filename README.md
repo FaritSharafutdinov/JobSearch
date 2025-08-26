@@ -23,7 +23,7 @@ Due to GitHub restrictions, it is not possible to download the original dataset.
 
 1. Clone the repository:
 ```
-git clone https://github.com/Bulatfakhrutdinov/job_search.git
+git clone https://github.com/FaritSharafutdinov/job_search.git
 ```
 
 ```
