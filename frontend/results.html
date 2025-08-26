@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Search Results</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .search-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .search-query {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f0f4f8;
+            border-radius: 4px;
+        }
+        .results-count {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        .job-card {
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: white;
+            transition: transform 0.2s;
+        }
+        .job-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .job-title {
+            font-size: 1.3em;
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+        .job-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 10px 0;
+            color: #555;
+            font-size: 0.9em;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+        }
+        .meta-item i {
+            margin-right: 5px;
+            color: #7f8c8d;
+        }
+        .job-description {
+            margin: 15px 0;
+            color: #444;
+            line-height: 1.6;
+        }
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .skill-tag {
+            background-color: #e1f0ff;
+            color: #2c6cb0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+        }
+        .salary {
+            font-weight: bold;
+            color: #27ae60;
+            margin: 10px 0;
+        }
+        .apply-btn {
+            display: inline-block;
+            padding: 8px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-weight: 500;
+        }
+        .apply-btn:hover {
+            background-color: #2980b9;
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<script>
+    function toggleDescription(link) {
+        const container = link.parentElement;
+        const shortText = container.querySelector('.short-text');
+        const fullText = container.querySelector('.full-text');
+
+        if (shortText.style.display === 'none') {
+            shortText.style.display = '';
+            fullText.style.display = 'none';
+            link.textContent = 'Show more';
+        } else {
+            shortText.style.display = 'none';
+            fullText.style.display = '';
+            link.textContent = 'Show less';
+        }
+    }
+</script>
+<body>
+    <div class="search-container">
+        <h1>Job Search Results</h1>
+
+        <div class="search-query">
+            <strong>Search query:</strong> {{ query }}
+        </div>
+
+        <div class="results-count">
+            Found {{ count }} matching jobs
+        </div>
+
+        {% if count > 0 %}
+            <div class="jobs-list">
+                {% for job in results %}
+                <div class="job-card">
+                    <h2 class="job-title">{{ job.title }}</h2>
+
+                    <div class="job-meta">
+                        <span class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            {{ job.published_date|datetimeformat('%b %d, %Y') }}
+                        </span>
+
+                        <span class="meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            {{ job.country }}
+                        </span>
+                    </div>
+
+                    {% if job.is_hourly == 'True' %}
+                    <div class="salary">
+                        <i class="fas fa-money-bill-wave"></i>
+                        Hourly: ${{ job.hourly_low }} - ${{ job.hourly_high }}
+                    </div>
+                    {% else %}
+                    <div class="salary">
+                        <i class="fas fa-money-bill-wave"></i>
+                        Fixed price: ${{ job.budget }}
+                    </div>
+                    {% endif %}
+
+                    <div class="job-description">
+                        <span class="short-text">{{ job.description[:400] }}{% if job.description|length > 400 %}...{% endif %}</span>
+                        {% if job.description|length > 400 %}
+                        <span class="full-text" style="display: none;">{{ job.description }}</span>
+                        <a href="#" class="toggle-description" onclick="toggleDescription(this); return false;">Show more</a>
+                        {% endif %}
+                    </div>
+
+
+                    {% if job.skills %}
+                    <div class="skills-container">
+                        {% for skill in job.skills %}
+                            <span class="skill-tag">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <a href="{{ job.link }}" class="apply-btn" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Apply Now
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-results">
+                <i class="fas fa-search fa-3x" style="color: #bdc3c7; margin-bottom: 15px;"></i>
+                <h3>No jobs found matching your criteria</h3>
+                <p>Try modifying your search query</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
