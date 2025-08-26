@@ -1,0 +1,8 @@
+flask==2.0.3
+werkzeug==2.0.3
+jinja2==3.0.3
+pymilvus==2.5.4
+nltk==3.9.1
+scikit-learn==1.6.1
+numpy==2.0.2
+python-dotenv==1.1.1
